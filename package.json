@@ -1,0 +1,25 @@
+{
+  "name": "ogov-importer",
+  "version": "1.0.0",
+  "description": "Argentina's Congress bill importer",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/seykron/ogov-importer.git"
+  },
+  "dependencies": {
+    "winston": "*",
+    "async": "*",
+    "cron": "*",
+    "jsdom": "*",
+    "request": "*",
+    "extend": "*"
+  },
+  "author": "seykron",
+  "license": "GPLv2",
+  "readmeFilename": "README.md",
+  "gitHead": "994dd014b72597fa843179e918a70ec2c06d7c8b"
+}
