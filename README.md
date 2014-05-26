@@ -1,7 +1,11 @@
-ogov-api-importer
-=================
+ogov-importer
+=============
 
-Argentina's Congress bill importer
+Argentina's Congress data importer. There following data can be imported:
+
+* Bills
+
+* Committees
 
 ## Installation
 
@@ -9,7 +13,7 @@ Argentina's Congress bill importer
   npm install ogov-importer
 ```
 
-## Basic usage
+## Bill importer
 
 Import bills and store them in memory.
 
@@ -43,7 +47,7 @@ Import bills and store them in memory.
 * *pageSize*: number of bills to retrieve in each page. Maximum and default is
   1000.
 
-## Storers
+### Storers
 
 The importer supports storers. A storer is an interface that allows to store bills in different data sources and it is designed to provide contention to the import process. There're two built-in storers:
 
@@ -81,7 +85,7 @@ function CustomStorer {
 }
 ```
 
-## Query Cache
+### Query Cache
 
 In order to improve performance it is possible to cache full queries results. It provides another level of contention to the import process. There's a built-in ```FileSystemCache``` that stores results in a file system directory. The following example shows how to implement a memory cache (completely useless, a nice implementation could be through memcached):
 
@@ -126,7 +130,7 @@ function CustomQueryCache() {
 }
 ```
 
-# Bill format
+### Bill format
 
 Bills contain the following normative elements:
 
@@ -170,5 +174,38 @@ Bills are represented by the following JSON structure:
     party: 'POLITICAL PARTY NAME',
     province: 'BUENOS AIRES'
   }]
+}
+```
+
+## Committees importer
+
+Import committees:
+
+```
+  var ogi = require("./index");
+  var committeeImporter = new ogi.CommitteeImporter();
+
+  committeeImporter.start(function (err, committees) {
+    if (err) {
+      throw err;
+    }
+    console.log(committees);
+  });
+```
+
+### Committee format
+
+Committees have a relationship with bills through the name.
+
+```
+{
+  name: 'DISCAPACIDAD',
+  url: 'http://www.hcdn.gob.ar/comisiones/permanentes/cdiscap/',
+  type: 'permanentes',
+  location: 'Riobamba 25 Piso 4° Oficina 455, CP C1025ABA , C.A.B.A.',
+  secretary: 'LIC. BARROS, ADOLFO',
+  chief: 'SRA.GOMEZ,MARTA M.',
+  meetings: 'Miercoles 10:00 Hs.',
+  phones: 'Of. Administrativa: (054-11) 4127-7100  interno:(2447/2448/2461)'
 }
 ```
