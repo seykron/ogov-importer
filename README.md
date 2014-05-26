@@ -1,10 +1,9 @@
 ogov-importer
 =============
 
-Argentina's Congress data importer. There following data can be imported:
+Argentina's Congress data importer. The following data can be imported:
 
 * Bills
-
 * Committees
 
 ## Installation
@@ -35,15 +34,10 @@ Import bills and store them in memory.
 ### Supported parameters
 
 * *lastPage*: page to resume a previous import process.
-
 * *queryCache*: cache implementation to store raw HTML result.
-
 * *storers*: list of storers to store bills in different data sources.
-
 * *logger*: winston logger instance.
-
 * *poolSize*: size of concurrent pages to process at the same time.
-
 * *pageSize*: number of bills to retrieve in each page. Maximum and default is
   1000.
 
