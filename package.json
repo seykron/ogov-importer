@@ -1,7 +1,7 @@
 {
   "name": "ogov-importer",
-  "version": "1.0.1",
-  "description": "Argentina's Congress bill importer",
+  "version": "1.0.2",
+  "description": "Argentina's Congress data importer",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
