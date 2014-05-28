@@ -64,7 +64,9 @@ var importer = new Importer({
   queryCache: new ogi.FileSystemCache(QUERY_CACHE_DIR),
   storers: [inMemoryStorer, new ogi.FileSystemStorer(DATA_DIR)]
 });
+
+LOG.info("Storing data to: " + DATA_DIR);
+
 importer.start(function () {
-  // TODO (seykron): rename getBills to getItems() or something more generic.
-  console.log("Imported items: " + inMemoryStorer.getBills().length);
+  console.log("Imported items: " + inMemoryStorer.getItems().length);
 });

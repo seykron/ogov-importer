@@ -5,6 +5,7 @@ Argentina's Congress data importer. The following data can be imported:
 
 * Bills
 * Committees
+* People (legislatives)
 
 ## Installation
 
@@ -12,57 +13,68 @@ Argentina's Congress data importer. The following data can be imported:
   npm install ogov-importer
 ```
 
-## Bill importer
+## Usage
 
-Import bills and store them in memory.
+There are some available importers:
+
+* BillImporter
+* CommitteeImporter
+* PeopleImporter
+
+The configuration is the same for all importers. The following example uses a BillImporter:
 
 ```
   var ogi = require("ogov-importer");
   var inMemoryStorer = new ogi.InMemoryStorer();
 
+  // Any importer could be used here.
   var importer = new ogi.BillImporter({
     storers: [inMemoryStorer]
   });
   importer.start(function () {
-    var bills = inMemoryStorer.getBills().length;
-    var errors = inMemoryStorer.getBillsInError().length;
-
-    console.log("Status: " + bills + " bills succeed, " + errors + " in error.");
+    console.log("Number of imported items: " + inMemoryStorer.getItems().length);
   });
 ```
 
 ### Supported parameters
 
-* *lastPage*: page to resume a previous import process.
-* *queryCache*: cache implementation to store raw HTML result.
-* *storers*: list of storers to store bills in different data sources.
-* *logger*: winston logger instance.
-* *poolSize*: size of concurrent pages to process at the same time.
-* *pageSize*: number of bills to retrieve in each page. Maximum and default is
-  1000.
+* *lastPage*: optional. Page to resume a previous import process.
+* *queryCache*: optional. cache implementation to store raw HTML result.
+* *storers*: required. List of storers to save imported items into different data sources.
+* *logger*: optional. Winston logger instance.
+* *poolSize*: optional. Size of concurrent pages to process at the same time.
+* *pageSize*: optional. Number of items to retrieve by page. Maximum and default is 1000.
+
+## Features
+
+* Storers: save imported data into different data sources.
+* Query cache: a cache to store full query results in order to increase performance reducing network usage.
+* Task-based import process designed to provide high-level contention.
+* Built-in script to run importers without coding :)
 
 ### Storers
 
-The importer supports storers. A storer is an interface that allows to store bills in different data sources and it is designed to provide contention to the import process. There're two built-in storers:
+The importer supports storers. A storer is an interface that allows to save imported items into different data sources and it is designed to provide contention to the import process. There're two built-in storers:
 
-* InMemoryStorer: stores bills in a memory map.
+* InMemoryStorer: stores items in a memory map.
 
-* FileSystemStorer: stores bills in a directory of the file system, using the
-bill identifier as file name.
+* FileSystemStorer: stores items in a directory of the file system, using the importer-ependant identifier.
 
 It is possible to implement a new storer according to the following interface:
 
 ```
 function CustomStorer {
   return {
-    /** Stores the specified bill with this storer.
+    /** Stores the specified item with this storer.
      *
-     * @param {Object} billData Bill to store. Cannot be null.
-     * @param {Function} callback Callback invoked when the bill is already
+     * @param {String} id Unique identifier for this element. Cannot be null or
+     *    empty.
+     * @param {Object} data Item to store. Cannot be null.
+     * @param {Function} callback Callback invoked when the item is already
      *    saved. Cannot be null.
      */
-    store: function (billData, callback) {
-      console.log("STORE: " + JSON.stringify(billData));
+    store: function (id, data, callback) {
+      console.log("STORE: [" + id + "]" + JSON.stringify(data));
       callback();
     },
 
@@ -124,7 +136,78 @@ function CustomQueryCache() {
 }
 ```
 
-### Bill format
+### Task-based import process
+
+An import process consist of tasks that retrieve and parse information in parallel. Each task loads a data url into a virtual DOM environment and it can use jQuery to easily parse data. It is possible to implement new importers extending the ```Importer``` interface. The most simple implementation may look as the following example:
+
+```
+function CustomImporter() {
+
+  /** Base class to inherit behaviour from. */
+  var Importer = require("./lib/Importer")
+
+  /** Current importer instance. */
+  var importer = new Importer(options);
+
+  /** Indicates whether the importer is already running or not. */
+  var enqueued = false;
+
+  return extend(importer, {
+
+    /** Executes an enqueued task.
+     *
+     * @param {Object} task Task to execute. Cannot be null.
+     * @param {String} task.name Task name. Cannot be null or empty.
+     * @param {Object} data Task specific data. Can be null.
+     */
+    execute: function (task, callback) {
+      importer.initEnv("http://[data.url]", function (errors, window) {
+        // ... Parse data with window.jQuery() ...
+        // ... store each item with importer.store(id, data, callback) ...
+
+        callback();
+      });
+    },
+
+    /** Enqueues a new task. Tasks will be executed as soon as the pool has
+     * space for new elements.
+     * @return {Object} Returns the task to enqueue, never null.
+     */
+    enqueueTask: function () {
+      if (enqueued) {
+        return null;
+      } else {
+        enqueued = true;
+        return {
+          name: "My custom task",
+          data: {}
+        };
+      }
+    }
+  });
+}
+```
+
+### Built-in script to run importers
+
+If you just want to run importers without caring about coding, it is possible to clone this repository and run the importer script:
+
+```
+  $ git clone https://github.com/seykron/ogov-importer/
+  $ cd ogov-importer
+  $ npm install
+  $ node importer
+    Importer not specified. Supported importers are:
+     bills
+     committees
+     people
+```
+
+This built-in importer stores all data in the ```data``` directory.
+
+## Data format
+
+### Bill
 
 Bills contain the following normative elements:
 
@@ -171,23 +254,7 @@ Bills are represented by the following JSON structure:
 }
 ```
 
-## Committees importer
-
-Import committees:
-
-```
-  var ogi = require("./index");
-  var committeeImporter = new ogi.CommitteeImporter();
-
-  committeeImporter.start(function (err, committees) {
-    if (err) {
-      throw err;
-    }
-    console.log(committees);
-  });
-```
-
-### Committee format
+### Committee
 
 Committees have a relationship with bills through the name.
 
@@ -201,5 +268,26 @@ Committees have a relationship with bills through the name.
   chief: 'SRA.GOMEZ,MARTA M.',
   meetings: 'Miercoles 10:00 Hs.',
   phones: 'Of. Administrativa: (054-11) 4127-7100  interno:(2447/2448/2461)'
+}
+```
+
+## People
+
+People have an indirect relationship with committees through the committee name. The name attribute can be used to link a single person with a bill through the list of bill subscribers.
+
+```
+{
+  pictureUrl: 'http://www4.hcdn.gob.ar/fotos/laguilar_medium.jpg',
+  name: 'AGUILAR, LINO WALTER',
+  user: 'laguilar',
+  email: 'laguilar@diputados.gob.ar',
+  district: 'SAN LUIS',
+  start: '10/12/2011',
+  end: '09/12/2015',
+  party: 'COMPROMISO FEDERAL',
+  committees: [{
+    name: 'CULTURA',
+    position: 'vocal'
+  }]
 }
 ```
