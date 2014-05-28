@@ -3,5 +3,6 @@ module.exports = {
   FileSystemStorer: require("./lib/FileSystemStorer"),
   FileSystemCache: require("./lib/FileSystemCache"),
   BillImporter: require("./lib/bill/BillImporter"),
-  CommitteeImporter: require("./lib/committee/CommitteeImporter")
+  CommitteeImporter: require("./lib/committee/CommitteeImporter"),
+  PeopleImporter: require("./lib/people/PeopleImporter")
 };
