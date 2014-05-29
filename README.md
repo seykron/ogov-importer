@@ -47,6 +47,7 @@ The configuration is the same for all importers. The following example uses a Bi
 
 ## Features
 
+* Importers are idempotent
 * Storers: save imported data into different data sources.
 * Query cache: a cache to store full query results in order to increase performance reducing network usage.
 * Task-based import process designed to provide high-level contention.
