@@ -274,7 +274,7 @@ Committees have a relationship with bills through the name.
 }
 ```
 
-## People
+### People
 
 People have an indirect relationship with committees through the committee name. The name attribute can be used to link a single person with a bill through the list of bill subscribers.
 
@@ -295,7 +295,7 @@ People have an indirect relationship with committees through the committee name.
 }
 ```
 
-## Votes
+### Votes
 
 Votes are imported from [PDF documents generated](http://www.hcdn.gob.ar/secadmin/ds_electronicos/actas_votacion-portada.html) in each Congress session.
 
