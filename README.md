@@ -6,6 +6,7 @@ Argentina's Congress data importer. The following data can be imported:
 * Bills
 * Committees
 * People (legislatives)
+* Votes
 
 ## Installation
 
@@ -20,6 +21,7 @@ There are some available importers:
 * BillImporter
 * CommitteeImporter
 * PeopleImporter
+* VoteImporter
 
 The configuration is the same for all importers. The following example uses a BillImporter:
 
@@ -289,6 +291,27 @@ People have an indirect relationship with committees through the committee name.
   committees: [{
     name: 'CULTURA',
     position: 'vocal'
+  }]
+}
+```
+
+## Votes
+
+Votes are imported from [PDF documents generated](http://www.hcdn.gob.ar/secadmin/ds_electronicos/actas_votacion-portada.html) in each Congress session.
+
+```
+{
+  description: 'Document description',
+  file: 'ID-PARLAMENTARIO',
+  orderPaper: 'id of order paper',
+  version: '1',
+  date: '10/12/2011',
+  hour: '18:44',
+  votes: [{
+    name: 'LEGISLATIVE, name',
+    party: 'Political Party',
+    province: 'Legislative province',
+    vote: 'AFIRMATIVO|ABSTENCION|NEGATIVO|AUSENTE'
   }]
 }
 ```
