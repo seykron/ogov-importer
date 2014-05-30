@@ -6,7 +6,8 @@ var currentImporter = process.argv[2];
 var IMPORTERS = {
   "bills": ogi.BillImporter,
   "committees": ogi.CommitteeImporter,
-  "people": ogi.PeopleImporter
+  "people": ogi.PeopleImporter,
+  "vote": ogi.VoteImporter
 };
 var Importer = IMPORTERS[currentImporter];
 

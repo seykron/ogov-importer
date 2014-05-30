@@ -16,7 +16,8 @@
     "cron": "*",
     "jsdom": "*",
     "request": "*",
-    "extend": "*"
+    "extend": "*",
+    "tmp": "*"
   },
   "author": "seykron",
   "license": "GPLv2",
