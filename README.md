@@ -5,7 +5,7 @@ Argentina's Congress data importer. The following data can be imported:
 
 * Bills
 * Committees
-* People (legislatives)
+* People (legislatives and senators)
 * Votes
 
 ## Installation
