@@ -126,6 +126,16 @@ function CustomQueryCache() {
       callback(null, cache[JSON.stringify(key)]);
     },
 
+    /** Determines whether the specified key exists in the cache.
+     *
+     * @param {String} key Key of the entry to verify. Cannot be null or empty.
+     * @param {Function} callback Receives an error and a boolean indicating
+     *    whether the entry exists in the cache. Cannot be null.
+     */
+    exists: function (key, callback) {
+      callback(null, cache.hasOwnProperty(key));
+    },
+
     /** Waits until all operations in the cache has finished.
      *
      * @param {Function} callback Invoked when there is no pending operations.
