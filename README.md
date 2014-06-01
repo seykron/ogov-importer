@@ -283,7 +283,7 @@ Committees have a relationship with bills through the name.
   phones: 'Of. Administrativa: (054-11) 4127-7100  interno:(2447/2448/2461)',
   members: [{
     name: "PORTELA, AGUSTIN ALBERTO",
-    role: "presidente",
+    position: "presidente",
     district: "CORRIENTES",
     block: "UCR"
   }]
