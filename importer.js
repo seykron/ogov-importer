@@ -4,10 +4,30 @@ var ogi = require("./index");
 var currentImporter = process.argv[2];
 
 var IMPORTERS = {
-  "bills": ogi.BillImporter,
-  "committees": ogi.CommitteeImporter,
-  "people": ogi.PeopleImporter,
-  "vote": ogi.VoteImporter
+  "bills": {
+    Klass: ogi.BillImporter,
+    storerOptions: {
+      deph: 2
+    }
+  },
+  "committees": {
+    Klass: ogi.CommitteeImporter,
+    storerOptions: {
+      deph: 0
+    }
+  },
+  "people": {
+    Klass: ogi.PeopleImporter,
+    storerOptions: {
+      deph: 0
+    }
+  },
+  "vote": {
+    Klass: ogi.VoteImporter,
+    storerOptions: {
+      deph: 0
+    }
+  }
 };
 var Importer = IMPORTERS[currentImporter];
 
@@ -58,14 +78,20 @@ var DATA_DIR = (function () {
 }());
 
 var inMemoryStorer = new ogi.InMemoryStorer();
-var importer = new Importer({
+var importer = new Importer.Klass({
+  startPage: 0,
   poolSize: 4,
   pageSize: 250,
   logger: LOG,
+  role: currentImporter,
   queryCache: new ogi.FileSystemCache(QUERY_CACHE_DIR),
-  storers: [inMemoryStorer, new ogi.FileSystemStorer(DATA_DIR)]
+  storers: [
+    inMemoryStorer,
+    new ogi.FileSystemStorer(DATA_DIR, Importer.storerOptions)
+  ]
 });
 
+LOG.info("Process PID: " + process.pid);
 LOG.info("Storing data to: " + DATA_DIR);
 
 importer.start(function () {
