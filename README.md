@@ -8,6 +8,8 @@ Argentina's Congress data importer. The following data can be imported:
 * People (legislatives and senators)
 * Votes
 
+Already imported data sets are available in [ogov-data](https://github.com/seykron/ogov-data).
+
 ## Installation
 
 ```
