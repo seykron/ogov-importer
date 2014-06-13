@@ -17,7 +17,9 @@
     "jsdom": "*",
     "request": "*",
     "extend": "*",
-    "tmp": "*"
+    "tmp": "*",
+    "pdf-text-extract": "*",
+    "jquery": "~2.1.1"
   },
   "author": "seykron",
   "license": "GPLv2",

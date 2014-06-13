@@ -320,6 +320,7 @@ Votes are imported from [PDF documents generated](http://www.hcdn.gob.ar/secadmi
 ```
 {
   description: 'Document description',
+  url: "http://www1.hcdn.gov.ar/ID_PARLAMENTARIO.pdf",
   file: 'ID-PARLAMENTARIO',
   orderPaper: 'id of order paper',
   version: '1',
@@ -330,6 +331,19 @@ Votes are imported from [PDF documents generated](http://www.hcdn.gob.ar/secadmi
     party: 'Political Party',
     province: 'Legislative province',
     vote: 'AFIRMATIVO|ABSTENCION|NEGATIVO|AUSENTE'
-  }]
+  }],
+  references: {
+    summary: "Votación en General y Particular de los siguientes Proyectos de Ley: Expedientes 2005-D-11, 124-S-12, 3561-D-12, 127-S-12,4929-D-12, 103-S-11, 1964-D-11, 5219-D-11, 2676-D-12.",
+    files: [ '2005-D-2011',
+      '0124-S-2012',
+      '3561-D-2012',
+      '0127-S-2012',
+      '4929-D-2012',
+      '0103-S-2011',
+      '1964-D-2011',
+      '5219-D-2011',
+      '2676-D-2012'
+    ]
+  }
 }
 ```

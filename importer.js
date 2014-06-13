@@ -79,9 +79,9 @@ var DATA_DIR = (function () {
 
 var inMemoryStorer = new ogi.InMemoryStorer();
 var importer = new Importer.Klass({
-  startPage: 0,
+  startPage: 70,
   poolSize: 4,
-  pageSize: 250,
+  pageSize: 1000,
   logger: LOG,
   role: currentImporter,
   queryCache: new ogi.FileSystemCache(QUERY_CACHE_DIR),
