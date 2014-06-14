@@ -241,6 +241,7 @@ Bills are represented by the following JSON structure:
   type: 'PROYECTO DE LEY|PROYECTO DE RESOLUCION|PROYECTO DE DECLARACION|ETC',
   source: 'Diputados|Senado',
   file: 'ID-PARLAMENTARIO',
+  textUrl: "http://www1.hcdn.gov.ar/proyectos_search/proyectosd.asp?whichpage=1&soloExpDip=&fromForm=1&chkFirmantes=on&chkComisiones=on&chkDictamenes=on&chkTramite=on&proy_expsen=2341-S-2006",
   publishedOn: 'Diario de Asuntos Entrados N° 5',
   creationTime: '2014-03-27T03:00:00.000Z',
   summary: 'Resumen del proyecto',
