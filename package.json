@@ -14,12 +14,11 @@
     "winston": "*",
     "async": "*",
     "cron": "*",
-    "jsdom": "*",
     "request": "*",
     "extend": "*",
     "tmp": "*",
     "pdf-text-extract": "*",
-    "jquery": "~2.1.1"
+    "cheerio": "*"
   },
   "author": "seykron",
   "license": "GPLv2",

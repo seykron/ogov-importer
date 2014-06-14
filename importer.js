@@ -79,7 +79,7 @@ var DATA_DIR = (function () {
 
 var inMemoryStorer = new ogi.InMemoryStorer();
 var importer = new Importer.Klass({
-  startPage: 70,
+  startPage: 0,
   poolSize: 4,
   pageSize: 1000,
   logger: LOG,
