@@ -95,5 +95,5 @@ LOG.info("Process PID: " + process.pid);
 LOG.info("Storing data to: " + DATA_DIR);
 
 importer.start(function () {
-  console.log("Imported items: " + inMemoryStorer.getItems().length);
+  console.log("Imported items: " + inMemoryStorer.getNumberOfItems());
 });
