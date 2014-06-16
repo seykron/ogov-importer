@@ -36,7 +36,7 @@ The configuration is the same for all importers. The following example uses a Bi
     storers: [inMemoryStorer]
   });
   importer.start(function () {
-    console.log("Number of imported items: " + inMemoryStorer.getItems().length);
+    console.log("Number of imported items: " + inMemoryStorer.getNumberOfItems());
   });
 ```
 
