@@ -259,7 +259,8 @@ Bills are represented by the following JSON structure:
     source: 'Diputados|Senado',
     orderPaper: 'MOCION SOBRE TABLAS (AFIRMATIVA)',
     date: '2014-03-27T03:00:00.000Z',
-    result: 'APROBADO'
+    result: 'APROBADO',
+    url: "realted url, if any"
   }],
   committees: ['PRESUPUESTO Y HACIENDA', 'ENERGIA Y COMBUSTIBLES'],
   subscribers: [{

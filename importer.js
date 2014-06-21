@@ -86,7 +86,6 @@ var importer = new Importer.Klass({
   role: currentImporter,
   queryCache: new ogi.FileSystemCache(QUERY_CACHE_DIR),
   storers: [
-    inMemoryStorer,
     new ogi.FileSystemStorer(DATA_DIR, Importer.storerOptions)
   ]
 });
@@ -94,6 +93,9 @@ var importer = new Importer.Klass({
 LOG.info("Process PID: " + process.pid);
 LOG.info("Storing data to: " + DATA_DIR);
 
+var start = new Date().getTime();
+
 importer.start(function () {
-  console.log("Imported items: " + inMemoryStorer.getNumberOfItems());
+  console.log("Imported items: " + inMemoryStorer.getNumberOfItems(),
+    "Elapsed time: " + ((new Date().getTime() - start)) / 1000) + " secs.";
 });
