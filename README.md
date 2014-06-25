@@ -328,6 +328,34 @@ Votes are imported from [PDF documents generated](http://www.hcdn.gob.ar/secadmi
   version: '1',
   date: '10/12/2011',
   hour: '18:44',
+  summary: {
+    majorityBase: "Votos Emitidos",
+    majorityType: "La mitad más uno",
+    quorum: "Más de la mitad",
+    present: {
+      identified: "223",
+      unknown: "0",
+      total: "223"
+    },
+    absent: "34",
+    affirmative: {
+      members: "217",
+      president: "0",
+      castingVote: "0",
+      total: "217"
+    },
+    negative: {
+      members: "0",
+      president: "0",
+      castingVote: "0",
+      total: "0"
+    },
+    abstention: {
+      members: "5",
+      president: "0",
+      total: "5"
+    }
+  },
   votes: [{
     name: 'LEGISLATIVE, name',
     party: 'Political Party',
