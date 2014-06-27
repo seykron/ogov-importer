@@ -86,6 +86,7 @@ var importer = new Importer.Klass({
   role: currentImporter,
   queryCache: new ogi.FileSystemCache(QUERY_CACHE_DIR),
   storers: [
+    inMemoryStorer,
     new ogi.FileSystemStorer(DATA_DIR, Importer.storerOptions)
   ]
 });
