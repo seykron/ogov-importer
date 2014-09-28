@@ -27,6 +27,12 @@ var IMPORTERS = {
     storerOptions: {
       deph: 0
     }
+  },
+  "events": {
+    Klass: ogi.EventsImporter,
+    storerOptions: {
+      deph: 0
+    }
   }
 };
 var Importer = IMPORTERS[currentImporter];
