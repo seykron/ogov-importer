@@ -102,7 +102,10 @@ LOG.info("Storing data to: " + DATA_DIR);
 
 var start = new Date().getTime();
 
-importer.start(function () {
+importer.start(function (err, terminated) {
   console.log("Imported items: " + inMemoryStorer.getNumberOfItems(),
     "Elapsed time: " + ((new Date().getTime() - start)) / 1000) + " secs.";
+  if (terminated) {
+    console.log("Import process finished.");
+  }
 });
