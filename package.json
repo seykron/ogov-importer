@@ -1,6 +1,6 @@
 {
   "name": "ogov-importer",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "description": "Argentina's Congress data importer",
   "main": "index.js",
   "scripts": {
