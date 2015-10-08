@@ -84,28 +84,26 @@ var DATA_DIR = (function () {
 }());
 
 var inMemoryStorer = new ogi.InMemoryStorer();
-var importer = new Importer.Klass({
+var storers = [
+  inMemoryStorer,
+  new ogi.FileSystemStorer(DATA_DIR, Importer.storerOptions)
+];
+var options = {
   startPage: 0,
   poolSize: 4,
   pageSize: 1000,
   logger: LOG,
   role: currentImporter,
-  queryCache: new ogi.FileSystemCache(QUERY_CACHE_DIR),
-  storers: [
-    inMemoryStorer,
-    new ogi.FileSystemStorer(DATA_DIR, Importer.storerOptions)
-  ]
-});
+  persistenceFile: path.join(DATA_DIR, "pool.json"),
+  resume: fs.existsSync(path.join(DATA_DIR, "pool.json")),
+  queryCache: new ogi.FileSystemCache(QUERY_CACHE_DIR)
+};
+var context = new ogi.ImporterContext(storers, options);
+var importer = new Importer.Klass(context, options);
 
 LOG.info("Process PID: " + process.pid);
 LOG.info("Storing data to: " + DATA_DIR);
 
 var start = new Date().getTime();
 
-importer.start(function (err, terminated) {
-  console.log("Imported items: " + inMemoryStorer.getNumberOfItems(),
-    "Elapsed time: " + ((new Date().getTime() - start)) / 1000) + " secs.";
-  if (terminated) {
-    console.log("Import process finished.");
-  }
-});
+importer.run();

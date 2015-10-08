@@ -1,4 +1,5 @@
 module.exports = {
+  ImporterContext: require("./lib/ImporterContext"),
   InMemoryStorer: require("./lib/InMemoryStorer"),
   FileSystemStorer: require("./lib/FileSystemStorer"),
   FileSystemCache: require("./lib/FileSystemCache"),

@@ -7,6 +7,7 @@ Argentina's Congress data importer. The following data can be imported:
 * Committees
 * People (legislatives and senators)
 * Votes
+* Events
 
 Already imported data sets are available in [ogov-data](https://github.com/seykron/ogov-data).
 
@@ -375,5 +376,41 @@ Votes are imported from [PDF documents generated](http://www.hcdn.gob.ar/secadmi
       '2676-D-2012'
     ]
   }
+}
+```
+
+### Events
+
+Events are meetings scheduled in the public agenda. This importer retrieves information about these events and the outcome of each meeting.
+
+```
+{
+  date: "2015-04-29T03:00:00.000Z",
+  event: {
+    date: "2015-04-29T03:00:00.000Z",
+    hour: "09:30",
+    location: "Sala 1 (227/229) - Reunión Conjunta",
+    committees: [
+      "LEGISLACION GENERAL",
+      "LEGISLACION DEL TRABAJO",
+      "PRESUPUESTO Y HACIENDA"
+    ],
+    topic: "Trabajador Guardavidas y Timonel.",
+    summary: "Régimen para el ejercicio del trabajador guardavidas y timonel. Marco regulatorio de presupuestos mínimos de guardavidas y del ambiente acuático; creación del Registro Nacional."
+  },
+  committees: [
+    "TURISMO"
+  ],
+  actions: [{
+    id: "3",
+    name: "ANÁLISIS DE PROYECTOS DE COMPETENCIA MIXTA",
+    items: [{
+      summary: "LEY (0067-S-2014) INSTITUIR EL 20 DE DICIEMBRE DE CADA AÑO COMO EL DIA NACIONAL DEL TURISMO SOCIAL.",
+        files: [
+          "0067-S-2014"
+        ],
+        result: "Aprobado por unanimidad en la parte de su competencia sin modificaciones"
+     }]
+  }]
 }
 ```
