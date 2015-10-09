@@ -25,20 +25,19 @@ There are some available importers:
 * CommitteeImporter
 * PeopleImporter
 * VoteImporter
+* EventsImporter
 
-The configuration is the same for all importers. The following example uses a BillImporter:
+The configuration is the same for all importers. The following example runs a
+BillImporter:
 
 ```
   var ogi = require("ogov-importer");
   var inMemoryStorer = new ogi.InMemoryStorer();
+  var context = new ogi.ImporterContext([inMemoryStorer]);
 
   // Any importer could be used here.
-  var importer = new ogi.BillImporter({
-    storers: [inMemoryStorer]
-  });
-  importer.start(function () {
-    console.log("Number of imported items: " + inMemoryStorer.getNumberOfItems());
-  });
+  var importer = new ogi.BillImporter(context);
+  importer.run();
 ```
 
 ### Supported parameters
@@ -64,34 +63,31 @@ The importer supports storers. A storer is an interface that allows to save impo
 
 * InMemoryStorer: stores items in a memory map.
 
-* FileSystemStorer: stores items in a directory of the file system, using the importer-ependant identifier.
+* FileSystemStorer: stores items in a bundle file.
 
 It is possible to implement a new storer according to the following interface:
 
 ```
 function CustomStorer {
   return {
+
     /** Stores the specified item with this storer.
      *
      * @param {String} id Unique identifier for this element. Cannot be null or
      *    empty.
      * @param {Object} data Item to store. Cannot be null.
-     * @param {Function} callback Callback invoked when the item is already
-     *    saved. Cannot be null.
+     * @return {Promise<Object,Error>} Returns a promise.
      */
-    store: function (id, data, callback) {
-      console.log("STORE: [" + id + "]" + JSON.stringify(data));
-      callback();
+    store (id, data) {
+      return new Promise((resolve, reject) => {
+        console.log("STORE: [" + id + "]" + JSON.stringify(data));
+        resolve();
+      });
     },
 
-    /** Waits until all operations in the storer has finished.
-     *
-     * @param {Function} callback Invoked when there is no pending operations.
-     *    Cannot be null.
+    /** Closes and clean up this storer.
      */
-    wait: function (callback) {
-      // No async operations pending.
-      callback();
+    close () {
     }
   };
 }
@@ -137,16 +133,6 @@ function CustomQueryCache() {
      */
     exists: function (key, callback) {
       callback(null, cache.hasOwnProperty(key));
-    },
-
-    /** Waits until all operations in the cache has finished.
-     *
-     * @param {Function} callback Invoked when there is no pending operations.
-     *    Cannot be null.
-     */
-    wait: function (callback) {
-      // No async operations pending.
-      callback();
     }
   };
 }
