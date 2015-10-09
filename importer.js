@@ -2,6 +2,7 @@ var fs = require("fs");
 var path = require("path");
 var ogi = require("./index");
 var currentImporter = process.argv[2];
+var debug = require("debug")("importer");
 
 var IMPORTERS = {
   "bills": {
@@ -51,16 +52,6 @@ if (!Importer) {
   return;
 }
 
-var LOG = (function () {
-  var winston = require("winston");
-  var logger = winston.Logger({
-    transports: [
-      new winston.transports.File({ filename: 'importer.log' })
-    ]
-  });
-  return winston;
-}());
-
 var QUERY_CACHE_DIR = (function () {
   var dataDir = path.join(__dirname, "data");
   var cache = path.join(__dirname, "data", "cache");
@@ -92,7 +83,6 @@ var options = {
   startPage: 0,
   poolSize: 4,
   pageSize: 1000,
-  logger: LOG,
   role: currentImporter,
   persistenceFile: path.join(DATA_DIR, "pool.json"),
   resume: fs.existsSync(path.join(DATA_DIR, "pool.json")),
@@ -101,9 +91,11 @@ var options = {
 var context = new ogi.ImporterContext(storers, options);
 var importer = new Importer.Klass(context, options);
 
-LOG.info("Process PID: " + process.pid);
-LOG.info("Storing data to: " + DATA_DIR);
+debug("Process PID: %s", process.pid);
+debug("Storing data to: %s", DATA_DIR);
 
 var start = new Date().getTime();
 
-importer.run();
+importer.run()
+  .then(() => debug("importer finished without errors"))
+  .catch(err => debug("importer finished with errors: %s", err));
