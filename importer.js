@@ -86,7 +86,8 @@ var options = {
   role: currentImporter,
   persistenceFile: path.join(DATA_DIR, "pool.json"),
   resume: fs.existsSync(path.join(DATA_DIR, "pool.json")),
-  queryCache: new ogi.FileSystemCache(QUERY_CACHE_DIR)
+  queryCache: new ogi.FileSystemCache(QUERY_CACHE_DIR),
+  encoding: "latin1"
 };
 var context = new ogi.ImporterContext(storers, options);
 var importer = new Importer.Klass(context, options);

@@ -16,6 +16,7 @@
     "cron": "*",
     "debug": "^2.2.0",
     "extend": "*",
+    "iconv": "^2.1.11",
     "pdf-text-extract": "*",
     "promise": "^7.0.4",
     "request": "*",
