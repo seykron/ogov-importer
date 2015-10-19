@@ -77,7 +77,7 @@ var DATA_DIR = (function () {
 var inMemoryStorer = new ogi.InMemoryStorer();
 var storers = [
   inMemoryStorer,
-  new ogi.FileSystemStorer(DATA_DIR, Importer.storerOptions)
+  new ogi.FileSystemStorer(DATA_DIR)
 ];
 var options = {
   startPage: 0,
@@ -95,8 +95,8 @@ var importer = new Importer.Klass(context, options);
 debug("Process PID: %s", process.pid);
 debug("Storing data to: %s", DATA_DIR);
 
-var start = new Date().getTime();
+debug("starting import process at %s", new Date());
 
 importer.run()
-  .then(() => debug("importer finished without errors"))
+  .then(() => debug("importer finished without errors at %s", new Date()))
   .catch(err => debug("importer finished with errors: %s", err));
