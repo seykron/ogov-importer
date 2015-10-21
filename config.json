@@ -1,0 +1,37 @@
+{
+  "cacheDir": "data/cache",
+  "importers": {
+    "bills": {
+      "dataDir": "data/bills/",
+      "poolSize": 4,
+      "pageSize": 1000,
+      "encoding": "latin1",
+      "history": {
+        "indexKeyName": "file",
+        "maxBufferSize": 209715200
+      }
+    },
+    "committees": {
+      "dataDir": "data/committees/",
+      "encoding": "utf8",
+      "history": {
+        "indexKeyName": "name"
+      }
+    },
+    "people": {
+      "dataDir": "data/people/",
+      "encoding": "utf8",
+      "history": {
+        "indexKeyName": "user"
+      }
+    },
+    "vote": {
+      "dataDir": "data/vote/",
+      "encoding": "utf8"
+    },
+    "events": {
+      "dataDir": "data/events/",
+      "encoding": "latin1"
+    }
+  }
+}
