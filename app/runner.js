@@ -94,7 +94,7 @@ module.exports = function (config, args) {
         commandName, "delta");
       var history;
       var historyEnabled = (!args.has("historyEnabled") ||
-        args.historyEnabled) && historyDataSource;
+        args.historyEnabled === "true") && historyDataSource;
 
       // History is enabled by default and only when there exist a previous
       // bundle file.
