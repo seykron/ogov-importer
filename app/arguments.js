@@ -13,6 +13,12 @@ module.exports = function arguments(list) {
     commands: []
   };
   var skip = false;
+  var cast = value => {
+    if (isNaN(value))
+      return value;
+    else
+      return parseInt(value, 10);
+  };
 
   process.argv.splice(2).forEach((item, index, items) => {
     var equalsPos = item.indexOf("=");
@@ -29,9 +35,9 @@ module.exports = function arguments(list) {
       } else {
         key = item.substr(0, equalsPos).trim();
       }
-      args[key] = item.substr(equalsPos + 1).trim();
+      args[key] = cast(item.substr(equalsPos + 1).trim());
     } else if (item.substr(0, 2) === "--") {
-      args[item.substr(2)] = items[index + 1];
+      args[item.substr(2)] = cast(items[index + 1]);
       skip = true;
     } else {
       args.commands.push(item);

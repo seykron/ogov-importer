@@ -1,7 +1,7 @@
 module.exports = function (config, args) {
 
   /** A date, in milliseconds. */
-  const DAY_MILLIS = 60 * 60 *24 * 1000;
+  const DAY_MILLIS = 60 * 60 * 30 * 1000;
 
   /** Promises library.
    * @type {Function}
@@ -140,12 +140,13 @@ module.exports = function (config, args) {
       return new Promise((resolve, reject) => {
         async.each(args.commands, (commandName, next) => {
           var commandConfig = config.importers[commandName];
+          var configWithArgs = Object.assign({}, commandConfig, args);
           var dataDir = path.normalize(commandConfig.dataDir);
           var dataFile = resolveDataFileName(dataDir, commandName);
           var context = new ogi.ImporterContext([
             new ogi.FileSystemStorer(dataFile)
-          ], Object.assign({}, commandConfig, args));
-          var command = Commands[commandName](context, commandConfig);
+          ], configWithArgs);
+          var command = Commands[commandName](context, configWithArgs);
 
           if (!fs.existsSync(dataDir)) {
             fs.mkdirSync(dataDir);
@@ -156,8 +157,8 @@ module.exports = function (config, args) {
           debug("running command '%s' with config %s", commandName,
             JSON.stringify(commandConfig));
 
-          useHistoryIfRequired(context, command, commandName, commandConfig);
-          command.run()
+          useHistoryIfRequired(context, command, commandName, commandConfig)
+            .then(() => command.run())
             .then(() => {
               debug("command finished without errors at %s", new Date());
               next();
