@@ -1,4 +1,4 @@
-module.exports = function (config, args) {
+module.exports = function (options, args) {
 
   /** A date, in milliseconds. */
   const DAY_MILLIS = 60 * 60 * 30 * 1000;
@@ -22,6 +22,11 @@ module.exports = function (config, args) {
 
   /** Async flow library. */
   var async = require("async");
+
+  /** Default configuration. */
+  var config = Object.assign({
+    queryCache: new ogi.FileSystemCache(options.cacheDir)
+  }, options, args);
 
   var Commands = {
     bills: ogi.BillImporter,
@@ -115,11 +120,13 @@ module.exports = function (config, args) {
   };
 
   (function __initialize() {
+    var cacheEnabled = args.has("cacheEnabled") && args.cacheEnabled;
+
     debug("process PID: %s", process.pid);
     debug("process args: %s", JSON.stringify(args));
     debug("initializing config: %s", JSON.stringify(config));
 
-    if (!args.has("cacheEnabled") || args.cacheEnabled) {
+    if (cacheEnabled) {
       debug("using cache, writing entries to: %s", config.cacheDir);
 
       if (!fs.existsSync(config.cacheDir)) {
@@ -140,7 +147,7 @@ module.exports = function (config, args) {
       return new Promise((resolve, reject) => {
         async.each(args.commands, (commandName, next) => {
           var commandConfig = config.importers[commandName];
-          var configWithArgs = Object.assign({}, commandConfig, args);
+          var configWithArgs = Object.assign({}, config, commandConfig, args);
           var dataDir = path.normalize(commandConfig.dataDir);
           var dataFile = resolveDataFileName(dataDir, commandName);
           var context = new ogi.ImporterContext([
