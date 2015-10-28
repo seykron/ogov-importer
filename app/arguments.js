@@ -14,9 +14,14 @@ module.exports = function arguments(list) {
   };
   var skip = false;
   var cast = value => {
-    if (isNaN(value))
-      return value;
-    else
+    if (isNaN(value)) {
+      if (value === "true")
+        return true;
+      else if (value === "false")
+        return false;
+      else
+        return value;
+    } else
       return parseInt(value, 10);
   };
 

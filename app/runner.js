@@ -27,7 +27,7 @@ module.exports = function (config, args) {
     bills: ogi.BillImporter,
     committees: ogi.CommitteeImporter,
     people: ogi.PeopleImporter,
-    vote: ogi.VoteImporter,
+    votes: ogi.VoteImporter,
     events: ogi.EventsImporter
   };
 

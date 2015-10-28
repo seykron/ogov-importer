@@ -10,6 +10,7 @@
     "type": "git",
     "url": "git://github.com/seykron/ogov-importer.git"
   },
+  "bin": "./importer.js",
   "dependencies": {
     "async": "*",
     "cheerio": "*",

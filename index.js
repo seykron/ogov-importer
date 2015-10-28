@@ -8,5 +8,6 @@ module.exports = {
   PeopleImporter: require("./lib/people/PeopleImporter"),
   VoteImporter: require("./lib/vote/VoteImporter"),
   EventsImporter: require("./lib/events/EventsImporter"),
-  History: require("./lib/History")
+  History: require("./lib/History"),
+  JsonIndex: require("./lib/JsonIndex")
 };

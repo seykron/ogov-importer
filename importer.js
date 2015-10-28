@@ -1,3 +1,5 @@
+#!/usr/bin/node
+
 const DEBUG = "importer,runner,history,bill_importer,committee_importer," +
   "people_importer,json_index";
 
