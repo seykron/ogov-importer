@@ -19,4 +19,5 @@ debug("starting import process at %s", new Date());
 
 runner.run()
   .then(() => debug("importer finished without errors at %s", new Date()))
-  .catch(err => debug("importer finished with errors: %s", err.stack));
+  .catch(err => debug("importer finished with errors: %s",
+    err.stack || JSON.stringify(err)));
