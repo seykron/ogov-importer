@@ -36,6 +36,14 @@ module.exports = function (options, args) {
     events: ogi.EventsImporter
   };
 
+  /** Available data providers that can be specified by configuration on each
+   * importer.
+   */
+  var DataProviders = {
+    json: ogi.JsonFileDataProvider,
+    mysql: ogi.MySqlDataProvider
+  };
+
   /** Search for a bundle file in the specified directory to use it as the
    * history data source. It only takes into account bundle files older than
    * a day (24 hours).
@@ -90,16 +98,18 @@ module.exports = function (options, args) {
         timestamp + "-" + baseName + ".json");
   };
 
-  var useHistoryIfRequired = function (context, command, commandName,
-      commandConfig) {
+  /** Setups the history for the specified command, if enabled.
+   * @param {Object} command Command to setup history for. Cannot be null.
+   */
+  var setupHistory = function (command) {
     return new Promise((resolve, reject) => {
       var historyStorer;
-      var historyDataSource = resolveHistoryDataSource(commandConfig.dataDir);
-      var historyFile = resolveDataFileName(commandConfig.dataDir,
-        commandName, "delta");
+      var historyDataSource = resolveHistoryDataSource(command.dataDir);
+      var historyFile = resolveDataFileName(command.dataDir,
+        command.name, "delta");
       var history;
-      var historyEnabled = (!args.has("historyEnabled") ||
-        args.historyEnabled === "true") && historyDataSource;
+      var historyEnabled = (!args.hasOwnProperty("historyEnabled") ||
+        args.historyEnabled === true) && historyDataSource;
 
       // History is enabled by default and only when there exist a previous
       // bundle file.
@@ -109,8 +119,8 @@ module.exports = function (options, args) {
 
         historyStorer = new ogi.FileSystemStorer(historyFile);
         history = new ogi.History(historyDataSource, historyStorer, command,
-          commandConfig.history);
-        context.addStorer(history);
+          command.config.history);
+        command.context.addStorer(history);
         resolve(history.load());
       } else {
         debug("no history enabled");
@@ -119,8 +129,118 @@ module.exports = function (options, args) {
     });
   };
 
+  /** Validates a that specified command(s) are supported.
+   * @param {String} commands Either a command name, or a comma-separated names,
+   *    or array of command names. Cannot be null.
+   */
+  var validateCommands = function (commands) {
+    var resolvedCommands = commands;
+
+    if (typeof commands === "string") {
+      resolvedCommands = [commands.split(",")];
+    }
+    resolvedCommands.forEach(commandName => {
+      if (!Commands.hasOwnProperty(commandName)) {
+        return reject(new Error("Command not found: " + commandName));
+      }
+    });
+
+    return resolvedCommands;
+  };
+
+  /** Creates and loads the data providers specified in the provided command
+   * configuration.
+   * @param {Object} commandConfig Command configuration which has data
+   *    providers information. Cannot be null.
+   */
+  var createDataProviders = function (commandConfig) {
+    return new Promise((resolve, reject) => {
+      var dataProviders;
+
+      if (!commandConfig.dataProviders) {
+        debug("no data providers for command");
+        return resolve();
+      }
+
+      debug("resolving data providers");
+
+      dataProviders = Object.keys(commandConfig.dataProviders).map(key => {
+        var dataProviderInfo = commandConfig.dataProviders[key];
+        var DataProviderClass = DataProviders[key];
+
+        if (DataProviders.hasOwnProperty(key)) {
+          return new DataProviderClass(dataProviderInfo.key,
+            dataProviderInfo.config);
+        } else {
+          debug("unsupported data provider: %s", key);
+          return null;
+        }
+      }).filter(dataProvider => dataProvider !== null);
+
+      debug("initializing data providers");
+
+      async.each(dataProviders, (dataProvider, next) => {
+        dataProvider.load().nodeify(next);
+      }, err => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(dataProviders);
+        }
+      });
+    });
+  };
+
+  var closeDataProviders = function (dataProviders) {
+    dataProviders.forEach(dataProvider => dataProvider.close());
+  };
+
+  var createCommand = function (commandName, commandConfig) {
+    return new Promise((resolve, reject) => {
+      debug("creating command");
+
+      resolve(createDataProviders(commandConfig).then((dataProviders) => {
+        var dataFile = resolveDataFileName(commandConfig.dataDir, commandName);
+        var context = new ogi.ImporterContext([
+          new ogi.FileSystemStorer(dataFile, dataProviders)
+        ], commandConfig);
+        var CommandClass = Commands[commandName];
+        var command = Object.assign(new CommandClass(context, commandConfig), {
+          context: context,
+          dataProviders: dataProviders,
+          config: commandConfig,
+          dataDir: path.normalize(commandConfig.dataDir)
+        });
+
+        debug("writing data to: %s", dataFile);
+
+        if (!fs.existsSync(command.dataDir)) {
+          fs.mkdirSync(command.dataDir);
+        }
+
+        return setupHistory(command).then(() => command);
+      }));
+    });
+  };
+
+  var run = function (commandName) {
+    return new Promise((resolve, reject) => {
+      var commandConfig = Object.assign({}, config,
+        config.importers[commandName], args);
+
+      resolve(createCommand(commandName, commandConfig).then(command => {
+        debug("starting command at %s", new Date());
+        debug("running command '%s' with config %s", commandName,
+          JSON.stringify(commandConfig));
+
+        return command.run().then(() =>
+          closeDataProviders(command.dataProviders));
+      }));
+    });
+  };
+
   (function __initialize() {
-    var cacheEnabled = args.has("cacheEnabled") && args.cacheEnabled;
+    var cacheEnabled = args.hasOwnProperty("cacheEnabled") && args.cacheEnabled;
 
     debug("process PID: %s", process.pid);
     debug("process args: %s", JSON.stringify(args));
@@ -135,48 +255,24 @@ module.exports = function (options, args) {
     } else {
       debug("cache disabled");
     }
-    args.commands.forEach(commandName => {
-      if (!Commands.hasOwnProperty(commandName)) {
-        return reject(new Error("Command not found: " + commandName));
-      }
-    });
   }());
 
   return {
-    run () {
+    run (commands) {
       return new Promise((resolve, reject) => {
-        async.each(args.commands, (commandName, next) => {
-          var commandConfig = config.importers[commandName];
-          var configWithArgs = Object.assign({}, config, commandConfig, args);
-          var dataDir = path.normalize(commandConfig.dataDir);
-          var dataFile = resolveDataFileName(dataDir, commandName);
-          var context = new ogi.ImporterContext([
-            new ogi.FileSystemStorer(dataFile)
-          ], configWithArgs);
-          var command = Commands[commandName](context, configWithArgs);
+        var resolvedCommands = validateCommands(commands || args.commands);
 
-          if (!fs.existsSync(dataDir)) {
-            fs.mkdirSync(dataDir);
-          }
-
-          debug("starting command at %s", new Date());
-          debug("writing data to: %s", dataFile);
-          debug("running command '%s' with config %s", commandName,
-            JSON.stringify(commandConfig));
-
-          useHistoryIfRequired(context, command, commandName, commandConfig)
-            .then(() => command.run())
-            .then(() => {
+        async.each(resolvedCommands,
+          (command, next) => run(command).nodeify(next),
+          (err) => {
+            if (err) {
+              debug("command finished with errors: %s", err);
+              reject(err);
+            } else {
               debug("command finished without errors at %s", new Date());
-              next();
-            })
-            .catch(err => next(err));
-        }, err => {
-          if (err)
-            reject(err);
-          else
-            resolve();
-        });
+              resolve();
+            }
+          });
       });
     }
   };

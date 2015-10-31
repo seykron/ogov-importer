@@ -50,9 +50,6 @@ module.exports = function arguments(list) {
   });
 
   return Object.assign(args, {
-    has (key) {
-      return this.hasOwnProperty(key);
-    },
     get (key) {
       return this[key];
     }

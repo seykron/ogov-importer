@@ -9,5 +9,9 @@ module.exports = {
   VoteImporter: require("./lib/vote/VoteImporter"),
   EventsImporter: require("./lib/events/EventsImporter"),
   History: require("./lib/History"),
-  JsonIndex: require("./lib/JsonIndex")
+  JsonIndex: require("./lib/JsonIndex"),
+  Runner: require("./app/runner"),
+  DataProvider: require("./lib/DataProvider"),
+  MySqlDataProvider: require("./lib/dataprovider/MySqlDataProvider"),
+  JsonFileDataProvider: require("./lib/dataprovider/JsonFileDataProvider")
 };
