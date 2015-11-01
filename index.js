@@ -11,7 +11,7 @@ module.exports = {
   History: require("./lib/History"),
   JsonIndex: require("./lib/JsonIndex"),
   Runner: require("./app/runner"),
-  DataProvider: require("./lib/DataProvider"),
+  Transformer: require("./lib/Transformer"),
   MySqlDataProvider: require("./lib/dataprovider/MySqlDataProvider"),
   JsonFileDataProvider: require("./lib/dataprovider/JsonFileDataProvider")
 };

@@ -104,7 +104,8 @@ module.exports = function (options, args) {
   var setupHistory = function (command) {
     return new Promise((resolve, reject) => {
       var historyStorer;
-      var historyDataSource = resolveHistoryDataSource(command.dataDir);
+      var historyDataSource = command.dataDir &&
+        resolveHistoryDataSource(command.dataDir);
       var historyFile = resolveDataFileName(command.dataDir,
         command.name, "delta");
       var history;
@@ -153,70 +154,70 @@ module.exports = function (options, args) {
    * @param {Object} commandConfig Command configuration which has data
    *    providers information. Cannot be null.
    */
-  var createDataProviders = function (commandConfig) {
+  var createTransformer = function (commandConfig) {
     return new Promise((resolve, reject) => {
+      var transformerInfo = commandConfig.transformer;
+      var transformer;
       var dataProviders;
 
-      if (!commandConfig.dataProviders) {
-        debug("no data providers for command");
+      if (!transformerInfo) {
+        debug("no transformer for command");
         return resolve();
       }
 
-      debug("resolving data providers");
+      debug("initializing data providers");
 
-      dataProviders = Object.keys(commandConfig.dataProviders).map(key => {
-        var dataProviderInfo = commandConfig.dataProviders[key];
-        var DataProviderClass = DataProviders[key];
-
+      dataProviders = Object.keys(transformerInfo.dataProviders).map(key => {
         if (DataProviders.hasOwnProperty(key)) {
-          return new DataProviderClass(dataProviderInfo.key,
-            dataProviderInfo.config);
+          return new DataProviders[key](transformerInfo.dataProviders[key]);
         } else {
           debug("unsupported data provider: %s", key);
           return null;
         }
       }).filter(dataProvider => dataProvider !== null);
 
-      debug("initializing data providers");
+      debug("creating transformer");
 
-      async.each(dataProviders, (dataProvider, next) => {
-        dataProvider.load().nodeify(next);
-      }, err => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(dataProviders);
-        }
-      });
+      transformer = new ogi.Transformer(dataProviders,
+        transformerInfo.key, transformerInfo.map);
+      resolve(transformer.load().then(() => transformer));
     });
   };
 
-  var closeDataProviders = function (dataProviders) {
-    dataProviders.forEach(dataProvider => dataProvider.close());
+  var createStorers = function (commandName, commandConfig, transformer) {
+    var dataDir, dataFile;
+
+    if (config.createStorers) {
+      return config.createStorers(commandName, commandConfig, transformer);
+    }
+
+    dataDir = path.normalize(commandConfig.dataDir);
+    dataFile = resolveDataFileName(dataDir, commandName);
+    debug("writing data to: %s", dataFile);
+
+    if (!fs.existsSync(dataDir)) {
+      fs.mkdirSync(dataDir);
+    }
+
+    return [new ogi.FileSystemStorer(dataFile, transformer)];
   };
 
   var createCommand = function (commandName, commandConfig) {
     return new Promise((resolve, reject) => {
       debug("creating command");
 
-      resolve(createDataProviders(commandConfig).then((dataProviders) => {
-        var dataFile = resolveDataFileName(commandConfig.dataDir, commandName);
-        var context = new ogi.ImporterContext([
-          new ogi.FileSystemStorer(dataFile, dataProviders)
-        ], commandConfig);
+      resolve(createTransformer(commandConfig).then((transformer) => {
+        debug(transformer);
+        var storers = createStorers(commandName, commandConfig, transformer);
+        var context = new ogi.ImporterContext(storers, commandConfig);
         var CommandClass = Commands[commandName];
         var command = Object.assign(new CommandClass(context, commandConfig), {
           context: context,
-          dataProviders: dataProviders,
+          transformer: transformer,
           config: commandConfig,
-          dataDir: path.normalize(commandConfig.dataDir)
+          dataDir: commandConfig.dataDir &&
+            path.normalize(commandConfig.dataDir)
         });
-
-        debug("writing data to: %s", dataFile);
-
-        if (!fs.existsSync(command.dataDir)) {
-          fs.mkdirSync(command.dataDir);
-        }
 
         return setupHistory(command).then(() => command);
       }));
@@ -233,8 +234,8 @@ module.exports = function (options, args) {
         debug("running command '%s' with config %s", commandName,
           JSON.stringify(commandConfig));
 
-        return command.run().then(() =>
-          closeDataProviders(command.dataProviders));
+        return command.run()
+          .then(() => command.transformer && command.transformer.close());
       }));
     });
   };
