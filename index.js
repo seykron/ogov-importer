@@ -13,5 +13,6 @@ module.exports = {
   Runner: require("./app/runner"),
   Transformer: require("./lib/Transformer"),
   MySqlDataProvider: require("./lib/dataprovider/MySqlDataProvider"),
-  JsonFileDataProvider: require("./lib/dataprovider/JsonFileDataProvider")
+  JsonFileDataProvider: require("./lib/dataprovider/JsonFileDataProvider"),
+  arguments: require("./app/arguments")
 };
