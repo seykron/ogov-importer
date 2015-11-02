@@ -263,6 +263,8 @@ module.exports = function (options, args) {
       return new Promise((resolve, reject) => {
         var resolvedCommands = validateCommands(commands || args.commands);
 
+        debug("preparing commands: %s", resolvedCommands);
+
         async.each(resolvedCommands,
           (command, next) => run(command).nodeify(next),
           (err) => {
